@@ -1,17 +1,40 @@
-import Head from "next/head";
-import Image from "next/image";
 import styles from "../styles/Home.module.css";
 import { useState, useEffect } from "react";
+import randomWords from "random-words";
 
 export default function Home() {
+  const [isGame, setIsGame] = useState(false);
+
   const [countdown, setCountDown] = useState("");
+
+  const [newWord, setNewWord] = useState(randomWords(10));
+  const [wordIndex, setWordIndex] = useState(0);
+  const [randomWord, setRandomWord] = useState(
+    wordToLetters(newWord[wordIndex])
+  );
+
+  const [textInput, setTextInput] = useState("");
+
+  function startGame() {
+    setIsGame(true);
+    setCountDown(false);
+  }
+
+  function wordToLetters(word) {
+    const letterArr = [];
+
+    for (const letter of word) {
+      letterArr.push({ letter: letter, color: "white" });
+    }
+    return letterArr;
+  }
 
   useEffect(() => {
     if (countdown) {
       function clock() {
         setTimeout(() => {
           setCountDown((prev) =>
-            typeof prev === "string" ? 3 : prev > 1 ? prev - 1 : ""
+            typeof prev === "string" ? 3 : prev > 1 ? prev - 1 : startGame()
           );
         }, 1000);
       }
@@ -20,15 +43,62 @@ export default function Home() {
     }
   }, [countdown]);
 
+  useEffect(() => {
+    for (let i = 0; i < textInput.length; i++) {
+      if (textInput[i] === randomWord[i].letter) {
+        let newArr = [...randomWord];
+        newArr[i] = { letter: randomWord[i].letter, color: "lightGreen" };
+        setRandomWord(newArr);
+      } else if (textInput[i] !== randomWord[i].letter) {
+        let newArr = [...randomWord];
+        newArr[i] = { letter: randomWord[i].letter, color: "red" };
+        setRandomWord(newArr);
+      }
+    }
+
+    if (textInput === newWord[wordIndex]) {
+      let index = wordIndex + 1;
+      setTextInput("");
+      setWordIndex(index);
+      setRandomWord(wordToLetters(newWord[index]));
+    }
+  }, [textInput]);
+
   function handleOnClick() {
     setCountDown("Get Ready!");
   }
 
+  function updateInput(e) {
+    const { value } = e.target;
+    setTextInput(value);
+  }
+  console.log(randomWord);
+  function genSpanLetters() {
+    if (randomWord) {
+      return randomWord.map((letter, index) => {
+        return (
+          <span key={index} style={{ color: letter.color }}>
+            {letter.letter}
+          </span>
+        );
+      });
+    } else {
+      return "";
+    }
+  }
   return (
     <div className={styles.container}>
-      <h1>Open All day and all night</h1>
+      <h1>Speed typing</h1>
       <div className={styles.gameWindow}>
-        <p className={styles.countdown}>{countdown}</p>
+        <p className={styles.countdown}>
+          {!isGame ? countdown : genSpanLetters()}
+        </p>
+        <input
+          type={"text"}
+          className={styles.textInput}
+          value={textInput}
+          onChange={(e) => updateInput(e)}
+        />
       </div>
       <div className={styles.buttonContainer}>
         <button className={styles.button} onClick={handleOnClick}>

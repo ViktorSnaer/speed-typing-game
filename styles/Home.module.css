@@ -17,6 +17,7 @@
 }
 
 .gameWindow {
+  position: relative;
   width: 70%;
   height: 50%;
   margin: 2rem auto;
@@ -51,4 +52,18 @@
   color: #fff;
   text-shadow: 0 0 7px #fff, 0 0 10px rgb(209, 110, 110);
   font-family: "Caveat", cursive;
+}
+
+.textInput {
+  position: absolute;
+  bottom: 0;
+  padding: 1rem;
+  font-size: 1rem;
+  text-align: center;
+  background-color: transparent;
+  border: 1px solid #fff;
+  box-shadow: 0 0 7px #fff, 0 0 10px rgb(209, 110, 110);
+  color: #fff;
+  text-shadow: 0 0 7px #fff, 0 0 10px rgb(209, 110, 110);
+  margin: 1rem;
 }
