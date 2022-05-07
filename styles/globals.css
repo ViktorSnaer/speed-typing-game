@@ -1,10 +1,26 @@
+@import url("https://fonts.googleapis.com/css2?family=Caveat&family=Water+Brush&display=swap");
+
 html,
 body {
   padding: 0;
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
-    Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
   background-color: rgb(2, 2, 29);
+  font-family: "Caveat", cursive;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p {
+  color: #fff;
+  text-shadow: 0 0 7px #fff, 0 0 10px rgb(209, 110, 110);
+}
+
+p {
+  font-size: 1.5rem;
 }
 
 a {

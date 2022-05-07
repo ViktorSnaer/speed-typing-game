@@ -1,6 +1,7 @@
 import styles from "../styles/Home.module.css";
 import { useState, useEffect, useRef } from "react";
 import randomWords from "random-words";
+import Timer from "../components/timer/Timer";
 
 export default function Home() {
   const [isGame, setIsGame] = useState(false);
@@ -95,7 +96,8 @@ export default function Home() {
     <div className={styles.container}>
       <h1>Speed typing</h1>
       <div className={styles.gameWindow}>
-        <p className={styles.countdown}>
+        <Timer min={1} sec={0} isGame={isGame} />
+        <p className={styles.centerScreen}>
           {!isGame ? countdown : genSpanLetters()}
         </p>
         <input
