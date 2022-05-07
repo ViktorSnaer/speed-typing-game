@@ -1,5 +1,5 @@
 import styles from "../styles/Home.module.css";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import randomWords from "random-words";
 
 export default function Home() {
@@ -7,7 +7,7 @@ export default function Home() {
 
   const [countdown, setCountDown] = useState("");
 
-  const [newWord, setNewWord] = useState(randomWords(10));
+  const [newWord, setNewWord] = useState(randomWords(216));
   const [wordIndex, setWordIndex] = useState(0);
   const [randomWord, setRandomWord] = useState(
     wordToLetters(newWord[wordIndex])
@@ -15,9 +15,12 @@ export default function Home() {
 
   const [textInput, setTextInput] = useState("");
 
+  const inputRef = useRef();
+
   function startGame() {
     setIsGame(true);
     setCountDown(false);
+    inputRef.current.focus();
   }
 
   function wordToLetters(word) {
@@ -34,7 +37,7 @@ export default function Home() {
       function clock() {
         setTimeout(() => {
           setCountDown((prev) =>
-            typeof prev === "string" ? 3 : prev > 1 ? prev - 1 : startGame()
+            typeof prev === "string" ? 1 : prev > 1 ? prev - 1 : startGame()
           );
         }, 1000);
       }
@@ -45,7 +48,9 @@ export default function Home() {
 
   useEffect(() => {
     for (let i = 0; i < textInput.length; i++) {
-      if (textInput[i] === randomWord[i].letter) {
+      if (textInput.length > randomWord.length) {
+        return;
+      } else if (textInput[i] === randomWord[i].letter) {
         let newArr = [...randomWord];
         newArr[i] = { letter: randomWord[i].letter, color: "lightGreen" };
         setRandomWord(newArr);
@@ -98,6 +103,7 @@ export default function Home() {
           className={styles.textInput}
           value={textInput}
           onChange={(e) => updateInput(e)}
+          ref={inputRef}
         />
       </div>
       <div className={styles.buttonContainer}>
