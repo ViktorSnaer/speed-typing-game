@@ -78,7 +78,7 @@ export default function Home() {
     const { value } = e.target;
     setTextInput(value);
   }
-  console.log(randomWord);
+
   function genSpanLetters() {
     if (randomWord) {
       return randomWord.map((letter, index) => {
@@ -92,11 +92,14 @@ export default function Home() {
       return "";
     }
   }
+
+  function timerFinished() {}
+
   return (
     <div className={styles.container}>
       <h1>Speed typing</h1>
       <div className={styles.gameWindow}>
-        <Timer min={1} sec={0} isGame={isGame} />
+        <Timer min={1} sec={0} timerFinished={timerFinished} isGame={isGame} />
         <p className={styles.centerScreen}>
           {!isGame ? countdown : genSpanLetters()}
         </p>
