@@ -10,6 +10,7 @@ export default function Home() {
 
   const [newWord, setNewWord] = useState(randomWords(216));
   const [wordIndex, setWordIndex] = useState(0);
+  const [typedWords, setTypedWords] = useState(0);
   const [randomWord, setRandomWord] = useState(
     wordToLetters(newWord[wordIndex])
   );
@@ -64,6 +65,7 @@ export default function Home() {
 
     if (textInput === newWord[wordIndex]) {
       let index = wordIndex + 1;
+      setTypedWords((prev) => prev + 1);
       setTextInput("");
       setWordIndex(index);
       setRandomWord(wordToLetters(newWord[index]));
@@ -93,7 +95,10 @@ export default function Home() {
     }
   }
 
-  function timerFinished() {}
+  function timerFinished() {
+    setIsGame(false);
+    // inputRef.current.
+  }
 
   return (
     <div className={styles.container}>
@@ -110,6 +115,7 @@ export default function Home() {
           onChange={(e) => updateInput(e)}
           ref={inputRef}
         />
+        <p>{typedWords}</p>
       </div>
       <div className={styles.buttonContainer}>
         <button className={styles.button} onClick={handleOnClick}>
