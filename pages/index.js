@@ -10,10 +10,16 @@ export default function Home() {
 
   const [newWord, setNewWord] = useState(randomWords(216));
   const [wordIndex, setWordIndex] = useState(0);
-  const [typedWords, setTypedWords] = useState(0);
+  // const [typedWords, setTypedWords] = useState(0);
   const [randomWord, setRandomWord] = useState(
     wordToLetters(newWord[wordIndex])
   );
+
+  const [rounds, setRounds] = useState([
+    { noWords: 0, isCompleted: false },
+    { noWords: 0, isCompleted: false },
+    { noWords: 0, isCompleted: false },
+  ]);
 
   const [textInput, setTextInput] = useState("");
 
@@ -97,14 +103,28 @@ export default function Home() {
 
   function timerFinished() {
     setIsGame(false);
-    // inputRef.current.
+    setRounds((prev) => {
+      let updated = false;
+      return prev.map((rep) => {
+        if (!rep.isCompleted && !updated) {
+          updated = true;
+          return { noWords: typedWords, isCompleted: true };
+        } else {
+          return { ...rep };
+        }
+      });
+    });
+  }
+
+  function logRounds() {
+    console.log(rounds);
   }
 
   return (
     <div className={styles.container}>
       <h1>Speed typing</h1>
       <div className={styles.gameWindow}>
-        <Timer min={1} sec={0} timerFinished={timerFinished} isGame={isGame} />
+        <Timer min={0} sec={5} timerFinished={timerFinished} isGame={isGame} />
         <p className={styles.centerScreen}>
           {!isGame ? countdown : genSpanLetters()}
         </p>
@@ -115,13 +135,14 @@ export default function Home() {
           onChange={(e) => updateInput(e)}
           ref={inputRef}
         />
-        <p>{typedWords}</p>
+        <p className={styles.typedWords}>No of words: {typedWords}</p>
       </div>
       <div className={styles.buttonContainer}>
         <button className={styles.button} onClick={handleOnClick}>
           Start Game
         </button>
       </div>
+      <button onClick={logRounds}>Log Rounds</button>
     </div>
   );
 }

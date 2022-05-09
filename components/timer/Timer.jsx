@@ -2,10 +2,8 @@ import React, { useEffect, useState } from "react";
 
 export default function Timer({ min, sec, isGame, timerFinished }) {
   const [timer, setTimer] = useState({ min, sec, isTimer: false });
-  console.log(timer);
 
   function runTimer() {
-    console.log("run timer is on");
     const interval = setInterval(() => {
       setTimer((prev) => {
         if (!prev.isTimer) {

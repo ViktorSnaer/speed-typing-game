@@ -68,3 +68,8 @@
   text-shadow: 0 0 7px #fff, 0 0 10px rgb(209, 110, 110);
   margin: 1rem;
 }
+
+.typedWords {
+  position: absolute;
+  top: 40px;
+}
