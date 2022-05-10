@@ -16,11 +16,11 @@ export default function Timer({ min, sec, isGame, timerFinished }) {
         } else if (prev.sec > 0) {
           return { ...prev, sec: prev.sec - 1 };
         } else if (prev.min === 0 && prev.sec === 0) {
-          clearInterval(interval);
           timerFinished();
+          clearInterval(interval);
           return {
-            min: 1,
-            sec: 0,
+            min,
+            sec,
             isTimer: false,
           };
         }

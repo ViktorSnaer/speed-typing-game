@@ -4,25 +4,24 @@ import randomWords from "random-words";
 import Timer from "../components/timer/Timer";
 
 export default function Home() {
+  // index
   const [isGame, setIsGame] = useState(false);
-
+  // index
   const [countdown, setCountDown] = useState("");
-
-  const [newWord, setNewWord] = useState(randomWords(216));
+  const [wordsArray, setWordsArray] = useState(randomWords(216));
   const [wordIndex, setWordIndex] = useState(0);
-  // const [typedWords, setTypedWords] = useState(0);
-  const [randomWord, setRandomWord] = useState(
-    wordToLetters(newWord[wordIndex])
-  );
+  const [finishedWords, setFinishedWords] = useState(0);
+  const [word, setWord] = useState(wordToArray(wordsArray[wordIndex]));
 
+  console.log(word);
   const [rounds, setRounds] = useState([
     { noWords: 0, isCompleted: false },
     { noWords: 0, isCompleted: false },
     { noWords: 0, isCompleted: false },
   ]);
-
+  const [roundNumber, setRoundNumber] = useState(2);
   const [textInput, setTextInput] = useState("");
-
+  const [inputDisabled, setInputDisabled] = useState(true);
   const inputRef = useRef();
 
   function startGame() {
@@ -31,7 +30,7 @@ export default function Home() {
     inputRef.current.focus();
   }
 
-  function wordToLetters(word) {
+  function wordToArray(word) {
     const letterArr = [];
 
     for (const letter of word) {
@@ -45,7 +44,7 @@ export default function Home() {
       function clock() {
         setTimeout(() => {
           setCountDown((prev) =>
-            typeof prev === "string" ? 1 : prev > 1 ? prev - 1 : startGame()
+            typeof prev === "string" ? 3 : prev > 1 ? prev - 1 : startGame()
           );
         }, 1000);
       }
@@ -56,30 +55,31 @@ export default function Home() {
 
   useEffect(() => {
     for (let i = 0; i < textInput.length; i++) {
-      if (textInput.length > randomWord.length) {
+      if (textInput.length > word.length) {
         return;
-      } else if (textInput[i] === randomWord[i].letter) {
-        let newArr = [...randomWord];
-        newArr[i] = { letter: randomWord[i].letter, color: "lightGreen" };
-        setRandomWord(newArr);
-      } else if (textInput[i] !== randomWord[i].letter) {
-        let newArr = [...randomWord];
-        newArr[i] = { letter: randomWord[i].letter, color: "red" };
-        setRandomWord(newArr);
+      } else if (textInput[i] === word[i].letter) {
+        let newArr = [...word];
+        newArr[i] = { letter: word[i].letter, color: "lightGreen" };
+        setWord(newArr);
+      } else if (textInput[i] !== word[i].letter) {
+        let newArr = [...word];
+        newArr[i] = { letter: word[i].letter, color: "red" };
+        setWord(newArr);
       }
     }
 
-    if (textInput === newWord[wordIndex]) {
+    if (textInput === wordsArray[wordIndex]) {
       let index = wordIndex + 1;
-      setTypedWords((prev) => prev + 1);
+      setFinishedWords((prev) => prev + 1);
       setTextInput("");
       setWordIndex(index);
-      setRandomWord(wordToLetters(newWord[index]));
+      setWord(wordToArray(wordsArray[index]));
     }
   }, [textInput]);
 
   function handleOnClick() {
     setCountDown("Get Ready!");
+    setInputDisabled(false);
   }
 
   function updateInput(e) {
@@ -87,46 +87,61 @@ export default function Home() {
     setTextInput(value);
   }
 
-  function genSpanLetters() {
-    if (randomWord) {
-      return randomWord.map((letter, index) => {
-        return (
-          <span key={index} style={{ color: letter.color }}>
-            {letter.letter}
-          </span>
-        );
-      });
-    } else {
-      return "";
-    }
+  function genSpanLetters(word) {
+    return word.map((letter, index) => {
+      return (
+        <span key={index} style={{ color: letter.color }}>
+          {letter.letter}
+        </span>
+      );
+    });
+  }
+
+  function nextRound(round) {
+    setCountDown(`Round ${round}`);
+    setTextInput("");
+    setWordIndex(0);
+    setWord(wordToArray(wordsArray[0]));
+    setInputDisabled(false);
+    inputRef.current.focus;
   }
 
   function timerFinished() {
     setIsGame(false);
-    setRounds((prev) => {
-      let updated = false;
-      return prev.map((rep) => {
-        if (!rep.isCompleted && !updated) {
-          updated = true;
-          return { noWords: typedWords, isCompleted: true };
-        } else {
-          return { ...rep };
-        }
+    if (rounds[2].isCompleted === false) {
+      setRounds((prev) => {
+        let updated = false;
+        return prev.map((rep) => {
+          if (!rep.isCompleted && !updated) {
+            updated = true;
+            return { noWords: finishedWords, isCompleted: true };
+          } else {
+            return { ...rep };
+          }
+        });
       });
-    });
-  }
-
-  function logRounds() {
-    console.log(rounds);
+      setTextInput("");
+      setInputDisabled(true);
+      setWordsArray(randomWords(216));
+      nextRound(roundNumber);
+      setRoundNumber(3);
+    }
   }
 
   return (
     <div className={styles.container}>
       <h1>Speed typing</h1>
       <div className={styles.gameWindow}>
-        <Timer min={0} sec={5} timerFinished={timerFinished} isGame={isGame} />
+        <div className={styles.timerContainer}>
+          <Timer
+            min={1}
+            sec={0}
+            timerFinished={timerFinished}
+            isGame={isGame}
+          />
+        </div>
         <p className={styles.centerScreen}>
-          {!isGame ? countdown : genSpanLetters()}
+          {!isGame ? countdown : genSpanLetters(word)}
         </p>
         <input
           type={"text"}
@@ -134,15 +149,17 @@ export default function Home() {
           value={textInput}
           onChange={(e) => updateInput(e)}
           ref={inputRef}
+          disabled={inputDisabled}
         />
-        <p className={styles.typedWords}>No of words: {typedWords}</p>
+        <div className={styles.numberOfWords}>
+          <p>Words: {finishedWords}</p>
+        </div>
       </div>
       <div className={styles.buttonContainer}>
         <button className={styles.button} onClick={handleOnClick}>
           Start Game
         </button>
       </div>
-      <button onClick={logRounds}>Log Rounds</button>
     </div>
   );
 }

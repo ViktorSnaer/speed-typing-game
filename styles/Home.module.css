@@ -22,9 +22,22 @@
   border: 1px solid #fff;
   box-shadow: 0 0 7px #fff, 0 0 10px rgb(209, 110, 110);
   border-radius: 10px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: repeat(4, 1fr);
+}
+
+.timerContainer {
+  grid-row: 1/2;
+  grid-column: 2/4;
   display: flex;
-  flex-direction: column;
-  align-items: center;
+  justify-content: center;
+}
+
+.numberOfWords {
+  grid-row: 1/2;
+  grid-column: 1/2;
+  padding-left: 1rem;
 }
 
 .buttonContainer {
@@ -46,18 +59,19 @@
 
 .centerScreen {
   font-size: 5rem;
-  text-align: center;
   color: #fff;
   text-shadow: 0 0 7px #fff, 0 0 10px rgb(209, 110, 110);
   font-family: "Caveat", cursive;
-  position: absolute;
-  bottom: 20%;
-  transform: translate(0, 0%);
+  grid-row: 1/5;
+  grid-column: 2/4;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .textInput {
-  position: absolute;
-  bottom: 0;
+  grid-row: 4/5;
+  grid-column: 2/4;
   padding: 1rem;
   font-size: 1rem;
   text-align: center;
@@ -67,9 +81,4 @@
   color: #fff;
   text-shadow: 0 0 7px #fff, 0 0 10px rgb(209, 110, 110);
   margin: 1rem;
-}
-
-.typedWords {
-  position: absolute;
-  top: 40px;
 }
