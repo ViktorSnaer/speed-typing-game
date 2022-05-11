@@ -4,22 +4,28 @@ import randomWords from "random-words";
 import Timer from "../components/timer/Timer";
 
 const wordsArray = randomWords(600);
+let finishedWords = 0;
+let rounds = [
+  { noWords: 0, isCompleted: false },
+  { noWords: 0, isCompleted: false },
+  { noWords: 0, isCompleted: false },
+];
 export default function Home() {
   const [isGame, setIsGame] = useState(false);
 
-  const [centerScreen, setCenterScreen] = useState("");
+  const [centerScreen, setCenterScreen] = useState(
+    <>
+      <button className={styles.button} onClick={handleOnClick}>
+        Start Game
+      </button>
+    </>
+  );
   const [wordIndex, setWordIndex] = useState(0);
-  const [finishedWords, setFinishedWords] = useState(0);
   const [word, setWord] = useState(wordToArray(wordsArray[wordIndex]));
-
-  const [rounds, setRounds] = useState([
-    { noWords: 0, isCompleted: true },
-    { noWords: 0, isCompleted: false },
-    { noWords: 0, isCompleted: false },
-  ]);
   const [roundNumber, setRoundNumber] = useState(2);
   const [textInput, setTextInput] = useState("");
   const [inputDisabled, setInputDisabled] = useState(true);
+  const [isInput, setIsInput] = useState(false);
   const inputRef = useRef();
 
   function startGame() {
@@ -28,6 +34,7 @@ export default function Home() {
   }
 
   function countDown() {
+    setIsInput(true);
     let count = 3;
     setCenterScreen("Get Ready!");
     const cleanup = setInterval(() => {
@@ -83,12 +90,11 @@ export default function Home() {
     if (isGame) {
       setCenterScreen(genSpanLetters(newArr));
     }
-    if (!isGame) {
+    if (!isGame && finishedWords > 0) {
       setCenterScreen("");
     }
-    // console.log("wordsArray: " + wordsArray[wordIndex]);
     if (textInput === wordsArray[wordIndex]) {
-      setFinishedWords((prev) => prev + 1);
+      finishedWords++;
       setTextInput("");
       setWordIndex((prev) => prev + 1);
       setWord(wordToArray(wordsArray[wordIndex + 1]));
@@ -106,18 +112,36 @@ export default function Home() {
   }
 
   function gameOver() {
-    let countdown = 10;
+    setIsInput(false);
+    const totalWords =
+      rounds[0].noWords + rounds[1].noWords + rounds[2].noWords;
+    const WPM = Math.floor(totalWords / (3 * 60));
+    let countdown = 13;
     const interval = setInterval(() => {
       countdown--;
       setCenterScreen(() => {
-        if (countdown > 7) {
+        if (countdown > 10) {
+          return "Number of words " + finishedWords;
+        } else if (countdown > 7) {
           return "Game Over";
-        } else if (countdown > 4) {
-          return "Total Words";
-        } else if (countdown > 1) {
-          return "Words per minute";
-        } else if (countdown === 0) {
+        }
+        // else if (countdown > 4) {
+        //   return "Total Words: " + totalWords;
+        // } else if (countdown > 1) {
+        //   return "Words per minute: " + WPM;
+        // }
+        else if (countdown === 0) {
           clearInterval(interval);
+          return (
+            <div className={styles.playAgain}>
+              <p>Total Words: {totalWords}</p>
+              <p>Words Per Min: {WPM}</p>
+              <p>Thank you for playing 🏆</p>
+              <button className={styles.button} onClick={handleOnClick}>
+                Play again
+              </button>
+            </div>
+          );
         }
       });
     }, 1000);
@@ -129,18 +153,18 @@ export default function Home() {
     setTextInput("");
     setInputDisabled(true);
 
-    if (rounds[2].isCompleted === false) {
-      setRounds((prev) => {
-        let updated = false;
-        return prev.map((rep) => {
-          if (!rep.isCompleted && !updated) {
-            updated = true;
-            return { noWords: finishedWords, isCompleted: true };
-          } else {
-            return { ...rep };
-          }
-        });
+    if (rounds[1].isCompleted === false) {
+      let update = false;
+      const updatedRounds = rounds.map((round) => {
+        if (!round.isCompleted && !update) {
+          update = true;
+          return { noWords: finishedWords, isCompleted: true };
+        } else {
+          return { ...round };
+        }
       });
+      rounds = updatedRounds;
+      console.log(rounds);
       setTimeout(() => {
         setCenterScreen("Words: " + finishedWords);
       }, 500);
@@ -149,11 +173,21 @@ export default function Home() {
       }, 3000);
       setRoundNumber(3);
     } else {
+      const finalRound = rounds.map((round, index) => {
+        if (index === 2) {
+          return { noWords: finishedWords, isCompleted: true };
+        } else {
+          return { ...round };
+        }
+      });
+      rounds = finalRound;
+      console.log(rounds);
       gameOver();
     }
   }
 
   function nextRound(round) {
+    finishedWords = 0;
     setCenterScreen("Round " + round);
     setTimeout(() => {
       countDown();
@@ -177,7 +211,7 @@ export default function Home() {
         <p className={styles.centerScreen}>{centerScreen}</p>
         <input
           type={"text"}
-          className={styles.textInput}
+          className={`${styles.textInput} ${!isInput && styles.hide}`}
           value={textInput}
           onChange={(e) => updateInput(e)}
           ref={inputRef}
@@ -186,11 +220,6 @@ export default function Home() {
         <div className={styles.numberOfWords}>
           <p>Words: {finishedWords}</p>
         </div>
-      </div>
-      <div className={styles.buttonContainer}>
-        <button className={styles.button} onClick={handleOnClick}>
-          Start Game
-        </button>
       </div>
     </div>
   );
