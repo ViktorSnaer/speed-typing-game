@@ -8,6 +8,7 @@ export default function Home() {
   const [isGame, setIsGame] = useState(false);
   // index
   const [countdown, setCountDown] = useState("");
+  const [centerScreen, setCenterScreen] = useState("");
   const [wordsArray, setWordsArray] = useState(randomWords(216));
   const [wordIndex, setWordIndex] = useState(0);
   const [finishedWords, setFinishedWords] = useState(0);
@@ -24,8 +25,10 @@ export default function Home() {
   const inputRef = useRef();
 
   function startGame() {
+    console.log("game starts");
     setIsGame(true);
-    setCountDown(false);
+    console.log(genSpanLetters(word));
+    // setCenterScreen(genSpanLetters(word));
     inputRef.current.focus();
   }
 
@@ -38,19 +41,30 @@ export default function Home() {
     return letterArr;
   }
 
-  useEffect(() => {
-    if (countdown) {
-      function clock() {
-        setTimeout(() => {
-          setCountDown((prev) =>
-            typeof prev === "string" ? 3 : prev > 1 ? prev - 1 : startGame()
-          );
-        }, 1000);
-      }
+  function genSpanLetters(word) {
+    return word.map((letter, index) => {
+      return (
+        <span key={index} style={{ color: letter.color }}>
+          {letter.letter}
+        </span>
+      );
+    });
+  }
 
-      clock();
-    }
-  }, [countdown]);
+  function countDown() {
+    console.log("count down function called");
+    let count = 3;
+    setCenterScreen("Get Ready!");
+    const cleanup = setInterval(() => {
+      if (count === 0) {
+        clearInterval(cleanup);
+        startGame();
+      } else {
+        setCenterScreen(count);
+      }
+      count--;
+    }, 1000);
+  }
 
   useEffect(() => {
     const newArr = word.map((letterObj, index) => {
@@ -69,6 +83,9 @@ export default function Home() {
     });
 
     setWord(newArr);
+    if (isGame) {
+      setCenterScreen(genSpanLetters(newArr));
+    }
 
     // bug not matching after next round
     if (textInput === wordsArray[wordIndex]) {
@@ -77,10 +94,10 @@ export default function Home() {
       setWordIndex((prev) => prev + 1);
       setWord(wordToArray(wordsArray[wordIndex + 1]));
     }
-  }, [textInput]);
+  }, [textInput, isGame]);
 
   function handleOnClick() {
-    setCountDown("Get Ready!");
+    countDown();
     setInputDisabled(false);
   }
 
@@ -89,15 +106,15 @@ export default function Home() {
     setTextInput(value);
   }
 
-  function genSpanLetters(word) {
-    return word.map((letter, index) => {
-      return (
-        <span key={index} style={{ color: letter.color }}>
-          {letter.letter}
-        </span>
-      );
-    });
-  }
+  // function genSpanLetters(word) {
+  //   return word.map((letter, index) => {
+  //     return (
+  //       <span key={index} style={{ color: letter.color }}>
+  //         {letter.letter}
+  //       </span>
+  //     );
+  //   });
+  // }
 
   function nextRound(round) {
     setCountDown(`Round ${round}`);
@@ -110,6 +127,9 @@ export default function Home() {
 
   function timerFinished() {
     setIsGame(false);
+    setTextInput("");
+    setInputDisabled(true);
+
     if (rounds[2].isCompleted === false) {
       setRounds((prev) => {
         let updated = false;
@@ -122,10 +142,12 @@ export default function Home() {
           }
         });
       });
-      setTextInput("");
-      setInputDisabled(true);
+
       setWordsArray(randomWords(216));
-      nextRound(roundNumber);
+      setCountDown("Total words: " + finishedWords);
+      setTimeout(() => {
+        nextRound(roundNumber);
+      }, 3000);
       setRoundNumber(3);
     }
   }
@@ -136,14 +158,15 @@ export default function Home() {
       <div className={styles.gameWindow}>
         <div className={styles.timerContainer}>
           <Timer
-            min={1}
-            sec={0}
+            min={0}
+            sec={30}
             timerFinished={timerFinished}
             isGame={isGame}
           />
         </div>
         <p className={styles.centerScreen}>
-          {!isGame ? countdown : genSpanLetters(word)}
+          {centerScreen}
+          {/* {!isGame ? countdown : genSpanLetters(word)} */}
         </p>
         <input
           type={"text"}
