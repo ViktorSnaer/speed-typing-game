@@ -3,7 +3,7 @@ import { useState, useEffect, useRef } from "react";
 import randomWords from "random-words";
 import Timer from "../components/timer/Timer";
 
-const wordsArray = randomWords(600);
+let wordsArray = randomWords(600);
 let finishedWords = 0;
 let rounds = [
   { noWords: 0, isCompleted: false },
@@ -93,6 +93,7 @@ export default function Home() {
     if (!isGame && finishedWords > 0) {
       setCenterScreen("");
     }
+
     if (textInput === wordsArray[wordIndex]) {
       finishedWords++;
       setTextInput("");
@@ -101,7 +102,21 @@ export default function Home() {
     }
   }, [textInput, isGame]);
 
+  function restartGame() {
+    setWordIndex(0);
+    setRoundNumber(2);
+    wordsArray = randomWords(600);
+    finishedWords = 0;
+    rounds = [
+      { noWords: 0, isCompleted: false },
+      { noWords: 0, isCompleted: false },
+      { noWords: 0, isCompleted: false },
+    ];
+    handleOnClick();
+  }
+
   function handleOnClick() {
+    setWord(wordToArray(wordsArray[0]));
     countDown();
     setInputDisabled(false);
   }
@@ -115,29 +130,23 @@ export default function Home() {
     setIsInput(false);
     const totalWords =
       rounds[0].noWords + rounds[1].noWords + rounds[2].noWords;
-    const WPM = Math.floor(totalWords / (3 * 60));
-    let countdown = 13;
+    const WPM = Math.floor(totalWords / 3);
+    let countdown = 5;
     const interval = setInterval(() => {
       countdown--;
       setCenterScreen(() => {
-        if (countdown > 10) {
-          return "Number of words " + finishedWords;
-        } else if (countdown > 7) {
+        if (countdown > 2) {
+          return "Words: " + finishedWords;
+        } else if (countdown > 1) {
           return "Game Over";
-        }
-        // else if (countdown > 4) {
-        //   return "Total Words: " + totalWords;
-        // } else if (countdown > 1) {
-        //   return "Words per minute: " + WPM;
-        // }
-        else if (countdown === 0) {
+        } else if (countdown === 0) {
           clearInterval(interval);
           return (
             <div className={styles.playAgain}>
               <p>Total Words: {totalWords}</p>
               <p>Words Per Min: {WPM}</p>
               <p>Thank you for playing 🏆</p>
-              <button className={styles.button} onClick={handleOnClick}>
+              <button className={styles.button} onClick={restartGame}>
                 Play again
               </button>
             </div>
@@ -164,7 +173,6 @@ export default function Home() {
         }
       });
       rounds = updatedRounds;
-      console.log(rounds);
       setTimeout(() => {
         setCenterScreen("Words: " + finishedWords);
       }, 500);
@@ -181,7 +189,6 @@ export default function Home() {
         }
       });
       rounds = finalRound;
-      console.log(rounds);
       gameOver();
     }
   }
@@ -197,30 +204,38 @@ export default function Home() {
   }
 
   return (
-    <div className={styles.container}>
-      <h1>Speed typing</h1>
-      <div className={styles.gameWindow}>
-        <div className={styles.timerContainer}>
-          <Timer
-            min={0}
-            sec={5}
-            timerFinished={timerFinished}
-            isGame={isGame}
+    <>
+      <div className={styles.container}>
+        <h1>Speed Typing Game</h1>
+        <p style={{ textAlign: "center", margin: "0" }}>
+          Three one-minute rounds of lightning fast speed typing ⚡
+        </p>
+        <div className={styles.gameWindow}>
+          <div className={styles.timerContainer}>
+            <Timer
+              min={1}
+              sec={0}
+              timerFinished={timerFinished}
+              isGame={isGame}
+            />
+          </div>
+          <p className={styles.centerScreen}>{centerScreen}</p>
+          <input
+            type={"text"}
+            className={`${styles.textInput} ${!isInput && styles.hide}`}
+            value={textInput}
+            onChange={(e) => updateInput(e)}
+            ref={inputRef}
+            disabled={inputDisabled}
           />
-        </div>
-        <p className={styles.centerScreen}>{centerScreen}</p>
-        <input
-          type={"text"}
-          className={`${styles.textInput} ${!isInput && styles.hide}`}
-          value={textInput}
-          onChange={(e) => updateInput(e)}
-          ref={inputRef}
-          disabled={inputDisabled}
-        />
-        <div className={styles.numberOfWords}>
-          <p>Words: {finishedWords}</p>
+          <div className={styles.numberOfWords}>
+            <p>Words: {finishedWords}</p>
+          </div>
         </div>
       </div>
-    </div>
+      <div className={styles.smallScreenMessage}>
+        <p>Not intended for mobile! 🦦</p>
+      </div>
+    </>
   );
 }
