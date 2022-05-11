@@ -13,7 +13,6 @@ export default function Home() {
   const [finishedWords, setFinishedWords] = useState(0);
   const [word, setWord] = useState(wordToArray(wordsArray[wordIndex]));
 
-  console.log(word);
   const [rounds, setRounds] = useState([
     { noWords: 0, isCompleted: false },
     { noWords: 0, isCompleted: false },
@@ -54,26 +53,29 @@ export default function Home() {
   }, [countdown]);
 
   useEffect(() => {
-    for (let i = 0; i < textInput.length; i++) {
-      if (textInput.length > word.length) {
-        return;
-      } else if (textInput[i] === word[i].letter) {
-        let newArr = [...word];
-        newArr[i] = { letter: word[i].letter, color: "lightGreen" };
-        setWord(newArr);
-      } else if (textInput[i] !== word[i].letter) {
-        let newArr = [...word];
-        newArr[i] = { letter: word[i].letter, color: "red" };
-        setWord(newArr);
+    const newArr = word.map((letterObj, index) => {
+      if (textInput[index] === letterObj.letter) {
+        return { ...letterObj, color: "lightGreen" };
+      } else if (
+        textInput[index] !== letterObj.letter &&
+        textInput.length > index
+      ) {
+        return { ...letterObj, color: "red" };
+      } else if (textInput[index] !== letterObj.letter) {
+        return { ...letterObj, color: "white" };
+      } else {
+        return { ...letterObj };
       }
-    }
+    });
 
+    setWord(newArr);
+
+    // bug not matching after next round
     if (textInput === wordsArray[wordIndex]) {
-      let index = wordIndex + 1;
       setFinishedWords((prev) => prev + 1);
       setTextInput("");
-      setWordIndex(index);
-      setWord(wordToArray(wordsArray[index]));
+      setWordIndex((prev) => prev + 1);
+      setWord(wordToArray(wordsArray[wordIndex + 1]));
     }
   }, [textInput]);
 
