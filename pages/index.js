@@ -204,38 +204,33 @@ export default function Home() {
   }
 
   return (
-    <>
-      <div className={styles.container}>
-        <h1>Speed Typing Game</h1>
-        <p style={{ textAlign: "center", margin: "0" }}>
-          Three one-minute rounds of lightning fast speed typing ⚡
-        </p>
-        <div className={styles.gameWindow}>
-          <div className={styles.timerContainer}>
-            <Timer
-              min={1}
-              sec={0}
-              timerFinished={timerFinished}
-              isGame={isGame}
-            />
-          </div>
-          <p className={styles.centerScreen}>{centerScreen}</p>
-          <input
-            type={"text"}
-            className={`${styles.textInput} ${!isInput && styles.hide}`}
-            value={textInput}
-            onChange={(e) => updateInput(e)}
-            ref={inputRef}
-            disabled={inputDisabled}
+    <div className={styles.container}>
+      <h1>Speed Typing Game</h1>
+      <p style={{ textAlign: "center", margin: "0" }}>
+        Three one-minute rounds of lightning fast speed typing ⚡
+      </p>
+      <div className={styles.gameWindow}>
+        <div className={styles.timerContainer}>
+          <Timer
+            min={1}
+            sec={0}
+            timerFinished={timerFinished}
+            isGame={isGame}
           />
-          <div className={styles.numberOfWords}>
-            <p>Words: {finishedWords}</p>
-          </div>
+        </div>
+        <p className={styles.centerScreen}>{centerScreen}</p>
+        <input
+          type={"text"}
+          className={`${styles.textInput} ${!isInput && styles.hide}`}
+          value={textInput}
+          onChange={(e) => updateInput(e)}
+          ref={inputRef}
+          disabled={inputDisabled}
+        />
+        <div className={styles.numberOfWords}>
+          <p>Words: {finishedWords}</p>
         </div>
       </div>
-      <div className={styles.smallScreenMessage}>
-        <p>Not intended for mobile! 🦦</p>
-      </div>
-    </>
+    </div>
   );
 }
